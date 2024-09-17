@@ -1,11 +1,6 @@
 {
     "CG" : [0,0,0],
     "weight" : 100.0,
-    "reference" : {
-        "area" : 8.0,
-        "longitudinal_length" : 1.0,
-        "lateral_length" : 4.0
-    },
     "controls" : {
         "aileron" : {
             "is_symmetric" : false
