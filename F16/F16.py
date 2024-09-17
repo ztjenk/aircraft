@@ -20,7 +20,7 @@ if __name__=="__main__":
 
     # Define the input file. The input file will contain the path to the aircraft
     # file, and so this does not need to be defined here.
-    input_file = "traditional_input.json"
+    input_file = "F16_input.json"
 
     # Initialize Scene object. This contains the airplane and all necessary
     # atmospheric data.
@@ -35,14 +35,14 @@ if __name__=="__main__":
     # dimensional forces and moments acting on the airplane. Note we need to know 
     # the name of the airplane to be able to access its data.
     FM_results = my_scene.solve_forces(dimensional=True, non_dimensional=False, verbose=True)
-    print(json.dumps(FM_results["traditional_airplane"]["total"], indent=4))
+    print(json.dumps(FM_results["F16"]["total"], indent=4))
 
     # Now let's get the airplane to its trim state in pitch. MachUpX will default to 
     # Using the 'elevator' control to trim out the airplane. We can use set_trim_state 
     # to have MachUpX set the trim state to be the new state of the airplane.
     trim_state = my_scene.pitch_trim(set_trim_state=True, verbose=True)
-    print(json.dumps(trim_state["traditional_airplane"], indent=4))
+    print(json.dumps(trim_state["F16"], indent=4))
 
     # Now that we're trimmed, let's see what our aerodynamic derivatives are.
     derivs = my_scene.derivatives()
-    print(json.dumps(derivs["traditional_airplane"], indent=4))
+    print(json.dumps(derivs["F16"], indent=4))

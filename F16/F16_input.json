@@ -21,8 +21,8 @@
     "scene" : {
         "atmosphere" : {},
         "aircraft" : {
-            "traditional_airplane" : {
-                "file" : "traditional_airplane.json",
+            "F16" : {
+                "file" : "F16.json",
                 "state" : {
                     "velocity" : 100,
                     "alpha" : 2.0,
