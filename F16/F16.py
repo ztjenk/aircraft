@@ -29,7 +29,7 @@ if __name__=="__main__":
     # We are now ready to perform analyses. display_wireframe will let us look at 
     # the aircraft we have created. To make sure we know where each lifting surface 
     # is, we'll set show_legend to true.
-    my_scene.display_wireframe(show_legend=True)
+    my_scene.display_wireframe(show_legend=False)
 
     # Let's see what forces are acting on the airplane. We'll output just the total
     # dimensional forces and moments acting on the airplane. Note we need to know 
