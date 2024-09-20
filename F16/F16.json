@@ -26,7 +26,7 @@
             "geometry": {
                 "outline_points": "64A204_coordinates.txt"
             }
-    },
+        },
         "NACA_0005" : {
             "type" : "linear",	
             "aL0" : 0,
@@ -35,7 +35,10 @@
             "Cma" : 0,
             "CD0" : 0.0045,
             "CD1" : 0,
-            "CD2" : 0.0076
+            "CD2" : 0.0076,
+            "geometry": {
+                "outline_points": "0005_coordinates.txt"
+            }
         },
         "NACA_0004" : {
             "type" : "linear",
@@ -45,7 +48,10 @@
             "Cma" : 0.00,
             "CD0" : 0.0045,
             "CD1" : 0.0,
-            "CD2" : 0.0082
+            "CD2" : 0.0082,
+            "geometry": {
+                "outline_points": "0004_coordinates.txt"
+            }
         }
     },
     "wings" : {
