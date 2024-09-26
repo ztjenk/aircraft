@@ -6,7 +6,6 @@ F-16 Aircraft Simulation using MachUpX
 import machupX as MX
 import numpy as np
 import json
-import os
 
 class MachUpXWrapper:
     """Wrapper class for handling MachUpX operations."""
@@ -84,27 +83,21 @@ class MachUpXWrapper:
         # Parse and return the relevant forces and moments
         return forces[aircraft_name]["total"]
 
-    def export_stl(self, stl_filename=None):
+    def export_stl(self, stl_filename):
         """Exports aircraft geometry as STL
         - stl_filename: Name of STL file to be saved (None if STL is not needed)
         - dxf_filename: Name of DXF file to be saved (None if DXF is not needeed)
         """
-        print(f"Exporting aircraft geometry to {stl_filename}...")
-        self.my_scene.export_stl()
+        if export_stl:
+            print(f"Exporting aircraft geometry to {stl_filename}...")
+            self.my_scene.export_stl(filename=stl_filename)
 
-        if stl_filename:
-            default_filename = "scene.stl"  # This is the default name used by MachUpX
-            if os.path.exists(default_filename):
-                os.rename(default_filename, stl_filename)
-                print(f"STL file renamed to {stl_filename}")
-
-    def export_dxf(self, dxf_filename_prefix=None):
+    def export_dxf_file(self):
         """Exports aircraft geometry as DXF
-        - dxf_filename: Name of DXF file to be saved (None if DXF is not needeed)
         """
-        if dxf_filename_prefix:
-            print(f"Exporting aircraft geometry to {dxf_filename_prefix}...")
-            self.my_scene.export_aircraft_dxf(dxf_filename_prefix)
+        if export_dxf:
+            print(f"Exporting aircraft geometry as a DXF")
+            self.my_scene.export_dxf()
 
 if __name__ == "__main__":
     # Define the input file for the scene
@@ -117,7 +110,7 @@ if __name__ == "__main__":
     #machupX_wrapper.display_geometry()
     
     # Define flight parameters
-    alphas = np.linspace(0,5,2)  # Range of angles of attack
+    alphas = np.linspace(0,0,1)  # Range of angles of attack
     beta = 0  # Sideslip angle
     velocity = 222.5211  # Velocity (ft/s)
     p, q, r = 0, 0, 0  # Angular rates (roll, pitch, yaw)
@@ -125,7 +118,7 @@ if __name__ == "__main__":
 
     # Which forces to solve for
     calc_dimensional = True
-    calc_non_dimensional = False
+    calc_non_dimensional = True
     # Loop through different angles of attack
     for alpha in alphas:
         print(f"alpha: {alpha} degrees")
@@ -142,11 +135,10 @@ if __name__ == "__main__":
 
     #### Export geometry
     # Decide which files to export
-    export_stl = True
+    export_stl = False
     export_dxf = False
     # Name of files to be exported
-    stl_filename = "F16.stl" if export_stl else None
-    dxf_filename_prefix = "F16" if export_dxf else None
+    stl_filename = "F16.stl"
 
-    machupX_wrapper.export_stl(stl_filename=stl_filename)
-    machupX_wrapper.export_dxf(dxf_filename_prefix=dxf_filename_prefix)
+    machupX_wrapper.export_stl(stl_filename)
+    machupX_wrapper.export_dxf_file()
