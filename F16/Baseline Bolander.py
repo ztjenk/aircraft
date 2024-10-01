@@ -30,7 +30,7 @@ def generate_data(params):
                                                             "aileron": d_a,
                                                             "rudder": d_r})
         x = my_scene.solve_forces(**forces_options)["F16"]["total"]
-    fm = [x[CD], x['CS'], x['CL'], x['Cl'], x['Cm'], x['Cn']]
+    fm = [x['CD'], x['CS'], x['CL'], x['Cl'], x['Cm'], x['Cn']]
     return (*params, *fm)
 
 def plot_model(x, y, color, ls, tag, marker, ax, label):
@@ -521,7 +521,7 @@ def _Cl_rbar(Clr_data, plot, skip_mask=False):
 
     a0 = np.array([x[0] for x in Clr_data if x[7] == 0.])
     Cl1 = np.zeros(len(a0))
-    [CL0,CL_alpha]=_CL0_CLalpha(np.array([xforxinClr_dataifx[7]==0.]),
+    [CL0,CL_alpha]=_CL0_CLalpha(np.array([x for x in Clr_data if x[7]==0.]),
                                 False)
     CL1=CL0+CL_alpha*a0*np.pi/180.
     if plot:
@@ -576,7 +576,7 @@ def _Cl_dr(Cldr_data, plot, skip_mask=False):
         y = [Cldr_p, Cl1 + Cl_dr * np.full(len(Cl1), dr)]
         color = [0.0] * 2
         ls = [':'] * 2
-        tag = [data, not]
+        tag = ['data', 'not']
         marker = '^'  # Placeholder for marker
         return [x, y, color, ls, tag, marker]
     return Cl_dr
@@ -721,519 +721,293 @@ def _Cn_rbar(Cnr_data, plot, skip_mask=False):
         return [x, y, color, ls, tag, marker]
     return Cn_rbar
 
-
-
-
-####
 def _Cn_da(Cnda_data, plot, skip_mask=False):
-Cn1 = np.array([x[13] for x in Cnda_data if x[3] == 0.])
-Cnda_p = np.array([x[13] for x in Cnda_data if x[3] == 20.])322
-CL1 = np.array([x[10] for x in Cnda_data if x[3] == 0.])
-da = np.deg2rad(20.)
-Cn_da = (Cnda_p - Cn1)/da
-if skip_mask:
-out_mask = [True]*len(Cn1)
-else:
-out_mask = remove_outliers(Cn_da)
-[Cn_Lda, Cn_da] = np.polyfit(CL1[out_mask], Cn_da[out_mask], 1)
-a0 = np.array([x[0] for x in Cnda_data if x[3] == 0.])
-Cn1 = np.zeros(len(Cn1))
-if plot:
-x = a0
-y = [Cnda_p, Cn1 + (Cn_Lda*CL1 + Cn_da)*da]
-color = [
-0.0
-]*2
-ls = [(0, (3, 5, 1, 5, 1, 5))]*2
-tag = [
-data
-, 
-not
-]
-marker = 
->
+    Cn1 = np.array([x[13] for x in Cnda_data if x[3] == 0.])
+    Cnda_p = np.array([x[13] for x in Cnda_data if x[3] == 20.])
+    CL1 = np.array([x[10] for x in Cnda_data if x[3] == 0.])
+    da = np.deg2rad(20.)
+    Cn_da = (Cnda_p - Cn1) / da
+    if skip_mask:
+        out_mask = [True] * len(Cn1)
+    else:
+        out_mask = remove_outliers(Cn_da)
+    [Cn_Lda, Cn_da] = np.polyfit(CL1[out_mask], Cn_da[out_mask], 1)
 
-return [x, y, color, ls, tag, marker]
-return Cn_da, Cn_Lda
+    a0 = np.array([x[0] for x in Cnda_data if x[3] == 0.])
+    Cn1 = np.zeros(len(Cn1))
+    if plot:
+        x = a0
+        y = [Cnda_p, Cn1 + (Cn_Lda * CL1 + Cn_da) * da]
+        color = ['0.0'] * 2
+        ls = [(0, (3, 5, 1, 5, 1, 5))] * 2
+        tag = ['data', 'not']
+        marker = '>'  
+        return [x, y, color, ls, tag, marker]
+    return Cn_da, Cn_Lda
+
 def _Cn_dr(Cndr_data, plot, skip_mask=False):
-Cn1 = np.array([x[13] for x in Cndr_data if x[4] == 0.])
-Cndr_p = np.array([x[13] for x in Cndr_data if x[4] == 30.])
-dr = np.deg2rad(30.)
-if skip_mask:
-out_mask = [True]*len(Cn1)
-else:
-out_mask = remove_outliers(Cndr_p)
-Cn_dr = np.average((Cndr_p - Cn1)[out_mask]/dr)
-b0 = np.array([x[1] for x in Cndr_data if x[4] == 0.])
-[Cn0, Cn_beta] = _Cn_beta(np.array([x for x in Cndr_data if x[4] == 0.]), False)
-Cn1 = Cn0 + Cn_beta*b0*np.pi/180.
-if plot:
-x = b0
-y = [Cndr_p, Cn1 + Cn_dr*dr]
-color = [
-0.0
-]*2
-ls = [
---
-]*2
-tag = [
-data
-, 
-not
-]
-marker = 
-v
+    Cn1 = np.array([x[13] for x in Cndr_data if x[4] == 0.])
+    Cndr_p = np.array([x[13] for x in Cndr_data if x[4] == 30.])
+    dr = np.deg2rad(30.)
+    if skip_mask:
+        out_mask = [True] * len(Cn1)
+    else:
+        out_mask = remove_outliers(Cndr_p)
+    Cn_dr = np.average((Cndr_p - Cn1)[out_mask] / dr)
 
-return [x, y, color, ls, tag, marker]
-return Cn_dr
+    b0 = np.array([x[1] for x in Cndr_data if x[4] == 0.])
+    [Cn0, Cn_beta] = _Cn_beta(np.array([x for x in Cndr_data if x[4] == 0.]), False)
+    Cn1 = Cn0 + Cn_beta * b0 * np.pi / 180.
+    if plot:
+        x = b0
+        y = [Cndr_p, Cn1 + Cn_dr * dr]
+        color = [0.0] * 2
+        ls = ['--'] * 2
+        tag = ['data', 'not']
+        marker = 'v'  # Placeholder for marker
+        return [x, y, color, ls, tag, marker]
+    return Cn_dr
+
+
 def create_database():
-data = np.zeros((N_alpha*N_other_a + N_beta*N_other_b, 14))
-params = np.zeros(8)
-zz = 0
-#len(alpha_range) 1a
-for a in alpha_range:
-params[0] = a
-data[zz, :] = generate_data(params)
-zz += 1
-params[0] = 0.
-#len(beta_range) 1b323
-for b in beta_range:
-params[1] = b
-data[zz, :] = generate_data(params)
-zz += 1
-params[1] = 0.
-#len(de_range)*len(a_range) len(de_range)*1a
-for e in de_range:
-params[2] = e
-for a in alpha_range:
-params[0] = a
-data[zz, :] = generate_data(params)
-zz += 1
-params[2] = 0.
-params[0] = 0.
-for da in da_range:
-params[3] = da
-#len(beta_range)
-for b in beta_range:
-params[1] = b
-data[zz, :] = generate_data(params)
-zz += 1
-params[1] = 0.
-#len(alpha_range)
-for a in alpha_range:
-params[0] = a
-data[zz, :] = generate_data(params)
-zz += 1
-params[0] = 0.
-params[3] = 0.
-#len(beta_range)
-for dr in dr_range:
-params[4] = dr
-for b in beta_range:
-params[1] = b
-data[zz, :] = generate_data(params)
-zz += 1
-params[1] = 0.
-params[4] = 0.
-#len(p_range)*(len(alpha_range) + len(beta_range))
-for p in p_range:
-params[5] = p
-for a in alpha_range:
-params[0] = a
-data[zz, :] = generate_data(params)
-zz += 1
-params[0] = 0.
-for b in beta_range:
-params[1] = b
-data[zz, :] = generate_data(params)
-zz += 1
-params[1] = 0.
-params[5] = 0.
-for q in q_range:
-params[6] = q
-for a in alpha_range:
-params[0] = a324
-data[zz, :] = generate_data(params)
-zz += 1
-params[6] = 0.
-#len(r_range)*(len(alpha_range) + len(beta_range))
-for r in r_range:
-params[7] = r
-for a in alpha_range:
-params[0] = a
-data[zz, :] = generate_data(params)
-zz += 1
-params[0] = 0.
-for b in beta_range:
-params[1] = b
-data[zz, :] = generate_data(params)
-zz += 1
-params[1] = 0.
-params[7] = 0.
-return data
+    data = np.zeros((N_alpha * N_other_a + N_beta * N_other_b, 14))
+    params = np.zeros(8)
+    zz = 0
+    # len(alpha_range) 1a
+    for a in alpha_range:
+        params[0] = a
+        data[zz, :] = generate_data(params)
+        zz += 1
+        params[0] = 0.
+        #len(beta_range)1b
+    for b in beta_range:
+        params[1] = b
+        data[zz, :] = generate_data(params)
+        zz += 1
+    params[1] = 0
+    #len(de_range)*len(a_range)len(de_range)*1a
+    for e in de_range:
+        params[2] = e
+        for a in alpha_range:
+            params[0] = a
+            data[zz, :] = generate_data(params)
+            zz += 1
+    params[2] = 0
+    params[0] = 0
+    for da in da_range:
+        params[3] = da
+        #len(bet_range)
+        for b in beta_range:
+            params[1] = b
+            data[zz, :] = generate_data(params)
+            zz += 1
+        params[1] = 0
+        #len(alpha_range)
+        for a in alpha_range:
+            params[0] = a
+            data[zz, :] = generate_data(params)
+            zz += 1
+        params[0] = 0
+    params[3] = 0
+    #len(beta_range)
+    for dr in dr_range:
+        params[4] = dr
+        for b in beta_range:
+            params[1] = b
+            data[zz, :] = generate_data(params)
+            zz += 1
+    params[1] = 0
+    params[4] = 0
+    #len(p_range)*(len(alpha_range) + len(beta_range))
+    for p in p_range:
+        params[5] = p
+        for a in alpha_range:
+            params[0] = a
+            data[zz, :] = generate_data(params)
+            zz += 1
+        params[0] = 0
+        for b in beta_range:
+            params[1] = b
+            data[zz, :] = generate_data(params)
+            zz += 1
+        params[1] = 0
+    params[5] = 0
+    for q in q_range:
+        params[6] = q
+        for a in alpha_range:
+            params[0] = a
+            data[zz, :] = generate_data(params)
+            zz += 1
+    params[6] = 0
+    #len(r_range)*(len(alpha_range) + len(beta_range))
+    for r in r_range:
+        params[7] = r
+        for a in alpha_range:
+            params[0] = a
+            data[zz, :] = generate_data(params)
+            zz += 1
+        params[0] = 0
+        for b in beta_range:
+            params[1] = b
+            data[zz, :] = generate_data(params)
+            zz += 1
+        params[1] = 0
+    params[7] = 0
+    return data
+
 def find_model(database):
-plot = False
-df = pd.DataFrame(database,
-columns = [
-Alpha
-,
-Beta
-,
-d_e
-, 
-d_a
-, 
-d_r
-, 
-p
-, 
-q
-, 
-r
-,
-CD
-, 
-CS
-, 
-CL
-, 
-Cl
-, 
-Cm
-, 
-Cn
-])
-CLalpha_data = df.loc[df[
-Beta
-] + df[
-d_e
-] + df[
-d_a
-] + df[
-d_r
-] +
-df[
-p
-] + df[
-q
-] + df[
-r
-] == 0].to_numpy()
-CL_0, CL_alpha = _CL0_CLalpha(CLalpha_data, plot)
-CLde_data = df.loc[df[
-Beta
-] + df[
-d_a
-] + df[
-d_r
-] +
-df[
-p
-] + df[
-q
-] + df[
-r
-] == 0].to_numpy()
-CL_de = _CL_de(CLde_data, plot)
-CLqbar_data = df.loc[df[
-Beta
-] + df[
-d_e
-] + df[
-d_a
-] + df[
-d_r
-] +
-df[
-p
-] + df[
-r
-] == 0].to_numpy()
-CL_qbar = _CL_qbar(CLqbar_data, plot)
-CSbeta_data = df.loc[((df[
-Alpha
-] + df[
-d_e
-] + df[
-d_a
-] + df[
-d_r
-] +
-df[
-p
-] + df[
-q
-] + df[
-r
-] == 0) &
-(df[
-Alpha
-] == 0.))].sort_values(by=[
-Beta
-]).to_numpy()
-CS_0, CS_beta = _CS_beta(CSbeta_data, plot)
-CSda_data = df.loc[((df[
-Alpha
-] + df[
-d_e
-] + df[
-d_r
-] +
-df[
-p
-] + df[
-q
-] + df[
-r
-] == 0) &
-(df[
-Alpha
-] == 0.))].sort_values(by=[
-Beta
-]).to_numpy()
-CS_da = _CS_da(CSda_data, plot)
-CSdr_data = df.loc[((df[
-Alpha
-] + df[
-d_e
-] + df[
-d_a
-] +
-df[
-p
-] + df[
-q
-] + df[
-r
-] == 0) &
-(df[
-Alpha
-] == 0.))].sort_values(by=[
-Beta
-]).to_numpy()
-CS_dr = _CS_dr(CSdr_data, plot)
-CSr_data = df.loc[((df[
-Beta
-] + df[
-d_e
-] + df[
-d_a
-] +
-df[
-p
-] + df[
-q
-] + df[
-d_r
-] == 0))].to_numpy()
-CS_rbar = _CS_rbar(CSr_data, plot)
-CSp_data = df.loc[((df[
-Beta
-] + df[
-d_e
-] + df[
-d_a
-] + df[
-d_r
-] +
-df[
-q
-] + df[
-r
-] == 0))].to_numpy()
-CS_pbar, CS_Lpbar = _CS_pbar(CSp_data, plot, skip_mask=True)
-CDde_data = df.loc[((df[
-Beta
-] + df[
-p
-] + df[
-d_a
-] + df[
-d_r
-] +
-df[
-q
-] + df[
-r
-] == 0))].to_numpy()
-CD_de, CD_Lde, CD_de2 = _CD_de(CDde_data, plot)
-CD_0, CD_L, CD_L2 = _CD_polar(CLalpha_data, plot)
-CD_S2 = _CD_Spolar(CSbeta_data, plot)[2]325
-CD_qbar, CD_Lqbar, CD_L2qbar = _CD_qbar(CLqbar_data, plot)
-CDp_data = df.loc[((df[
-Alpha
-] + df[
-d_e
-] + df[
-d_a
-] + df[
-d_r
-] +
-df[
-q
-] + df[
-r
-] == 0) &
-(df[
-Alpha
-] == 0.))].to_numpy()
-CDr_data = df.loc[((df[
-Alpha
-] + df[
-d_e
-] + df[
-d_a
-] + df[
-d_r
-] +
-df[
-q
-] + df[
-p
-] == 0) &
-(df[
-Alpha
-] == 0.))].to_numpy()
-CD_pbar, CD_Spbar = _CD_pbar(CDp_data, plot, skip_mask=True)
-CD_rbar, CD_Srbar = _CD_rbar(CDr_data, plot)
-CD_da, CD_Sda = _CD_da(CSda_data, plot)
-CD_dr, CD_Sdr = _CD_dr(CSdr_data, plot)
-Cl_0, Cl_beta = _Cl_beta(CSbeta_data, plot)
-Cl_pbar = _Cl_pbar(CSp_data, plot)
-Cl_rbar, Cl_Lrbar = _Cl_rbar(CSr_data, plot)
-Cl_da = _Cl_da(CSda_data, plot)
-Cl_dr = _Cl_dr(CSdr_data, plot)
-Cm_0, Cm_alpha = _Cm0_Cmalpha(CLalpha_data, plot)
-Cm_qbar = _Cm_qbar(CLqbar_data, plot)
-Cm_de = _Cm_de(CLde_data, plot)
-Cn_0, Cn_beta = _Cn_beta(CSbeta_data, plot)
-Cn_pbar, Cn_Lpbar = _Cn_pbar(CSp_data, plot, skip_mask=True)
-Cn_rbar = _Cn_rbar(CSr_data, plot)
-Cnda_data = df.loc[((df[
-Beta
-] + df[
-p
-] + df[
-d_e
-] + df[
-d_r
-] +
-df[
-q
-] + df[
-r
-] == 0))].to_numpy()
-Cn_da, Cn_Lda = _Cn_da(Cnda_data, plot)
-Cn_dr = _Cn_dr(CSdr_data, plot)
-coeff_database = {"CL": {"CL_0": CL_0,
-"CL_alpha": CL_alpha,
-"CL_qbar": CL_qbar,
-"CL_de": CL_de},
-"CS": {"CS_beta": CS_beta,
-"CS_pbar": CS_pbar,
-"CS_Lpbar": CS_Lpbar,
-"CS_rbar": CS_rbar,
-"CS_da": CS_da,
-"CS_dr": CS_dr},
-"CD": {"CD_0": CD_0,
-"CD_L": CD_L,
-"CD_L2": CD_L2,
-"CD_S2": CD_S2,
-"CD_Spbar": CD_Spbar,
-"CD_qbar": CD_qbar,
-"CD_Lqbar": CD_Lqbar,
-"CD_L2qbar": CD_L2qbar,
-"CD_Srbar": CD_Srbar,
-"CD_de": CD_de,
-"CD_Lde": CD_Lde,
-"CD_de2": CD_de2,
-"CD_Sda": CD_Sda,
-"CD_Sdr": CD_Sdr},
-"Cell": {"Cl_beta": Cl_beta,
-"Cl_pbar": Cl_pbar,
-"Cl_rbar": Cl_rbar,
-"Cl_Lrbar": Cl_Lrbar,
-"Cl_da": Cl_da,
-"Cl_dr": Cl_dr},326
-"Cm": {"Cm_0": Cm_0,
-"Cm_alpha": Cm_alpha,
-"Cm_qbar": Cm_qbar,
-"Cm_de": Cm_de},
-"Cn": {"Cn_beta": Cn_beta,
-"Cn_pbar": Cn_pbar,
-"Cn_Lpbar": Cn_Lpbar,
-"Cn_rbar": Cn_rbar,
-"Cn_da": Cn_da,
-"Cn_Lda": Cn_Lda,
-"Cn_dr": Cn_dr}}
-return coeff_database
+    plot = False
+    df = pd.DataFrame(database, 
+                      columns=["Alpha", "Beta", "d_e", "d_a", "d_r", "p", "q", "r", 
+                               "CD", "CS", "CL", "Cl", "Cm", "Cn"])
+    CLalpha_data = df.loc[df["Beta"] + df["d_e"] + df["d_a"] + df["d_r"] +
+                          df["p"] + df["q"] + df["r"] == 0].to_numpy()
+    CL_0, CL_alpha = _CL0_CLalpha(CLalpha_data, plot)
+    CLde_data = df.loc[df["Beta"] + df["d_a"] + df["d_r"] +
+                       df["p"] + df["q"] + df["r"] == 0].to_numpy()
+    CL_de = _CL_de(CLde_data, plot)
+    CLqbar_data = df.loc[df["Beta"] + df["d_e"] + df["d_a"] + df["d_r"] +
+                         df["p"] + df["r"] == 0].to_numpy()
+    CL_qbar = _CL_qbar(CLqbar_data, plot)
+    CSbeta_data = df.loc[((df["Alpha"] + df["d_e"] + df["d_a"] + df["d_r"] +
+                          df["p"] + df["q"] + df["r"] == 0) &
+                          (df["Alpha"] == 0.))].sort_values(by=["Beta"]).to_numpy()
+    CS_0, CS_beta = _CS_beta(CSbeta_data, plot)
+    CSda_data = df.loc[((df["Alpha"] + df["d_e"] + df["d_r"] +
+                         df["p"] + df["q"] + df["r"] == 0) &
+                        (df["Alpha"] == 0.))].sort_values(by=["Beta"]).to_numpy()
+    CS_da = _CS_da(CSda_data, plot)
+    CSdr_data = df.loc[((df["Alpha"] + df["d_e"] + df["d_a"] +
+                         df["p"] + df["q"] + df["r"] == 0) &
+                        (df["Alpha"] == 0.))].sort_values(by=["Beta"]).to_numpy()
+    CS_dr = _CS_dr(CSdr_data, plot)
+    CSr_data = df.loc[((df["Beta"] + df["d_e"] + df["d_a"] +
+                        df["p"] + df["q"] + df["d_r"] == 0))].to_numpy()
+    CS_rbar = _CS_rbar(CSr_data, plot)
+    CSp_data = df.loc[((df["Beta"] + df["d_e"] + df["d_a"] + df["d_r"] +
+                        df["q"] + df["r"] == 0))].to_numpy()
+    CS_pbar, CS_Lpbar = _CS_pbar(CSp_data, plot, skip_mask=True)
+    CDde_data = df.loc[((df["Beta"] + df["p"] + df["d_a"] + df["d_r"] +
+                         df["q"] + df["r"] == 0))].to_numpy()
+    CD_de, CD_Lde, CD_de2 = _CD_de(CDde_data, plot)
+    CD_0, CD_L, CD_L2 = _CD_polar(CLalpha_data, plot)
+    CD_S2 = _CD_Spolar(CSbeta_data, plot)[2]
+    CD_qbar, CD_Lqbar, CD_L2qbar = _CD_qbar(CLqbar_data, plot)
+    CDp_data = df.loc[((df["Alpha"] + df["d_e"] + df["d_a"] + df["d_r"] +
+                        df["q"] + df["r"] == 0) &
+                       (df["Alpha"] == 0.))].to_numpy()
+    CDr_data = df.loc[((df["Alpha"] + df["d_e"] + df["d_a"] + df["d_r"] +
+                        df["q"] + df["p"] == 0) &
+                       (df["Alpha"] == 0.))].to_numpy()
+    CD_pbar, CD_Spbar = _CD_pbar(CDp_data, plot, skip_mask=True)
+    CD_rbar, CD_Srbar = _CD_rbar(CDr_data, plot)
+    CD_da, CD_Sda = _CD_da(CSda_data, plot)
+    CD_dr, CD_Sdr = _CD_dr(CSdr_data, plot)
+    Cl_0, Cl_beta = _Cl_beta(CSbeta_data, plot)
+    Cl_pbar = _Cl_pbar(CSp_data, plot)
+    Cl_rbar, Cl_Lrbar = _Cl_rbar(CSr_data, plot)
+    Cl_da = _Cl_da(CSda_data, plot)
+    Cl_dr = _Cl_dr(CSdr_data, plot)
+    Cm_0, Cm_alpha = _Cm0_Cmalpha(CLalpha_data, plot)
+    Cm_qbar = _Cm_qbar(CLqbar_data, plot)
+    Cm_de = _Cm_de(CLde_data, plot)
+    Cn_0, Cn_beta = _Cn_beta(CSbeta_data, plot)
+    Cn_pbar, Cn_Lpbar = _Cn_pbar(CSp_data, plot, skip_mask=True)
+    Cn_rbar = _Cn_rbar(CSr_data, plot)
+    Cnda_data = df.loc[((df["Beta"] + df["p"] + df["d_e"] + df["d_r"] +
+                         df["q"] + df["r"] == 0))].to_numpy()
+    Cn_da, Cn_Lda = _Cn_da(Cnda_data, plot)
+    Cn_dr = _Cn_dr(CSdr_data, plot)
+    coeff_database = {"CL": {"CL_0": CL_0, 
+                             "CL_alpha": CL_alpha, 
+                             "CL_qbar": CL_qbar, 
+                             "CL_de": CL_de},
+                      "CS": {"CS_beta": CS_beta, 
+                             "CS_pbar": CS_pbar, 
+                             "CS_Lpbar": CS_Lpbar, 
+                             "CS_rbar": CS_rbar, 
+                             "CS_da": CS_da, 
+                             "CS_dr": CS_dr},
+                      "CD": {"CD_0": CD_0, 
+                             "CD_L": CD_L, 
+                             "CD_L2": CD_L2, 
+                             "CD_S2": CD_S2, 
+                             "CD_Spbar": CD_Spbar, 
+                             "CD_qbar": CD_qbar, 
+                             "CD_Lqbar": CD_Lqbar, 
+                             "CD_L2qbar": CD_L2qbar, 
+                             "CD_Srbar": CD_Srbar, 
+                             "CD_de": CD_de, 
+                             "CD_Lde": CD_Lde, 
+                             "CD_de2": CD_de2, 
+                             "CD_Sda": CD_Sda, 
+                             "CD_Sdr": CD_Sdr},
+                      "Cl": {"Cl_beta": Cl_beta, 
+                             "Cl_pbar": Cl_pbar, 
+                             "Cl_rbar": Cl_rbar, 
+                             "Cl_Lrbar": Cl_Lrbar, 
+                             "Cl_da": Cl_da, 
+                             "Cl_dr": Cl_dr},
+                      "Cm": {"Cm_0": Cm_0, 
+                             "Cm_alpha": Cm_alpha, 
+                             "Cm_qbar": Cm_qbar, 
+                             "Cm_de": Cm_de},
+                      "Cn": {"Cn_beta": Cn_beta, 
+                             "Cn_pbar": Cn_pbar, 
+                             "Cn_Lpbar": Cn_Lpbar, 
+                             "Cn_rbar": Cn_rbar, 
+                             "Cn_da": Cn_da, 
+                             "Cn_Lda": Cn_Lda, 
+                             "Cn_dr": Cn_dr}}
+    return coeff_database
+
 c_w = 11.46
 b_w = 31.92
 V = 222.5211
 if __name__ == "__main__":
-plt.close(
-all
-)
-nasa = True
-save = True
-path_to_Ndb_file = 
-./nasa_database.csv
-
-path_to_Mdb_file = 
-./f16_database.csv
-
-Nfile_exists = exists(path_to_Ndb_file)
-Mfile_exists = exists(path_to_Mdb_file)
-alpha_range = np.arange(-10., 11., 5.)
-N_alpha = len(alpha_range)
-beta_range = np.arange(-6., 7., 2.)
-N_beta = len(beta_range)
-da_range = np.array([-20., 20.])
-dr_range = np.array([-30., 30.])
-de_range = np.array([-10., 10.])
-p_range = np.array([-90., 90.])*np.pi/180.
-q_range = np.array([-30., 30.])*np.pi/180.
-r_range = np.array([-30., 30.])*np.pi/180.
-N_other_a = 1 + len(de_range) + len(p_range) + len(q_range) + len(r_range) +\
-len(da_range)
-N_other_b = 1 + len(da_range) + len(p_range) + len(r_range) + len(dr_range)
-input_file = "F16_input.json"
-my_scene = mx.Scene(input_file)
-forces_options = {
-body_frame
-: True,
-stab_frame
-: False,
-wind_frame
-: True,
-dimensional
-: False,
-verbose
-: False}
-if not Nfile_exists:
-nasa = True
-case = wind.F16_windtunnel()
-N_database = np.unique(create_database(), axis=0)
-np.savetxt(path_to_Ndb_file, N_database, delimiter=
-,
-)
-if not Mfile_exists:
-nasa = False
-M_database = np.unique(create_database(), axis=0)
-np.savetxt(path_to_Mdb_file, M_database, delimiter=
-,
-)
-if Mfile_exists*Nfile_exists:
-M_database = np.genfromtxt(path_to_Mdb_file, delimiter=
-,
-)
-N_database = np.genfromtxt(path_to_Ndb_file, delimiter=
-,
-)327
-if nasa:
-N_coeff_data = find_model(N_database)
-with open("nasa_model.json", "w") as outfile:
-json.dump(N_coeff_data, outfile, indent=4)
-M_coeff_data = find_model(M_database)
-with open("f16_model.json", "w") as outfile:
-json.dump(M_coeff_data, outfile, indent=4)
+    plt.close('all')
+    nasa = True
+    save = True
+    path_to_Ndb_file = "./nasa_database.csv"
+    path_to_Mdb_file = "./f16_database.csv"
+    Nfile_exists = exists(path_to_Ndb_file)
+    Mfile_exists = exists(path_to_Mdb_file)
+    alpha_range = np.arange(-10., 11., 5.)
+    N_alpha = len(alpha_range)
+    beta_range = np.arange(-6., 7., 2.)
+    N_beta = len(beta_range)
+    da_range = np.array([-20., 20.])
+    dr_range = np.array([-30., 30.])
+    de_range = np.array([-10., 10.])
+    p_range = np.array([-90., 90.]) * np.pi / 180.
+    q_range = np.array([-30., 30.]) * np.pi / 180.
+    r_range = np.array([-30., 30.]) * np.pi / 180.
+    N_other_a = 1 + len(de_range) + len(p_range) + len(q_range) + len(r_range) +\
+                len(da_range)
+    N_other_b = 1 + len(da_range) + len(p_range) + len(r_range) + len(dr_range)
+    input_file = "F16_input.json"
+    my_scene = mx.Scene(input_file)
+    forces_options = {"body_frame": True,
+                      "stab_frame": False,
+                      "wind_frame": True,
+                      "dimensional": False,
+                      "verbose": False}
+    if not Nfile_exists:
+        nasa = True
+        case = wind.F16_windtunnel()
+        N_database = np.unique(create_database(), axis=0)
+        np.savetxt(path_to_Ndb_file, N_database, delimiter=',')
+    if not Mfile_exists:
+        nasa = False
+        M_database = np.unique(create_database(), axis=0)
+        np.savetxt(path_to_Mdb_file, M_database, delimiter=',')
+    if Mfile_exists * Nfile_exists:
+        M_database = np.genfromtxt(path_to_Mdb_file, delimiter=',')
+        N_database = np.genfromtxt(path_to_Ndb_file, delimiter=',')
+    if nasa:
+        N_coeff_data = find_model(N_database)
+        with open("nasa_model.json", "w") as outfile:
+            json.dump(N_coeff_data, outfile, indent=4)
+    M_coeff_data = find_model(M_database)
+    with open("f16_model.json", "w") as outfile:
+        json.dump(M_coeff_data, outfile, indent=4)

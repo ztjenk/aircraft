@@ -107,7 +107,7 @@ if __name__ == "__main__":
     machupX_wrapper = MachUpXWrapper(input_file)
 
     # Display the aircraft geometry
-    #machupX_wrapper.display_geometry()
+    machupX_wrapper.display_geometry()
     
     # Define flight parameters
     alphas = np.linspace(0,0,1)  # Range of angles of attack
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     machupX_wrapper.derivatives("F16")
 
     # If you want to solve forces again in trimmed state
-    # machupX_wrapper.solve_forces(velocity, trimmed_alpha, beta, p, q, r, trimmed_elevator, rudder, aileron, "F16", dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
+    machupX_wrapper.solve_forces(velocity, trimmed_alpha, beta, p, q, r, trimmed_elevator, rudder, aileron, "F16", dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
 
     #### Export geometry
     # Decide which files to export
