@@ -6,6 +6,7 @@ F-16 Aircraft Simulation using MachUpX
 import machupX as MX
 import numpy as np
 import json
+import pandas as pd
 
 class MachUpXWrapper:
     """Wrapper class for handling MachUpX operations."""
@@ -75,13 +76,54 @@ class MachUpXWrapper:
         self.my_scene.set_aircraft_state(state=state)
         self.my_scene.set_aircraft_control_state(control_state=control_state)
 
-        # Solve for forces and moments in the body frame (non-dimensional)
+        # Solve for forces and moments in the body frame
         forces = self.my_scene.solve_forces(dimensional=dimensional, non_dimensional=non_dimensional, verbose=False)
 
-        print(json.dumps(forces[aircraft_name]["total"], indent=4))
+        # print(json.dumps(forces[aircraft_name]["total"], indent=4))
 
         # Parse and return the relevant forces and moments
         return forces[aircraft_name]["total"]
+
+    def export_to_excel(self, filename, velocity, dimensional=False, non_dimensional=True, aircraft_name="F16"):
+        "Generates an Excel file with simulation results"
+        # Define ranges for the variables to iterate over
+        alphas = np.linspace(-10, 10, 5)  # Range of angles of attack
+        betas = np.linspace(-6, 6, 7)
+        ailerons = np.linspace(-10, 10, 1)
+        elevators = np.linspace(-20, 20, 1)
+        rudders = np.linspace(-30, 30, 1)
+        p_vals = np.linspace(-90, 90, 1)
+        q_vals = np.linspace(-30, 30, 1)
+        r_vals = np.linspace(-30, 30, 1)
+
+        # Create a list to store the data
+        data = []
+
+        # Iterate through all the combinations of values
+        for alpha in alphas:
+            for beta in betas:
+                for aileron in ailerons:
+                    for elevator in elevators:
+                        for rudder in rudders:
+                            for p in p_vals:
+                                for q in q_vals:
+                                    for r in r_vals:
+                                        forces = self.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, aircraft_name,
+                                                                   dimensional=dimensional, non_dimensional=non_dimensional)
+                                        CD = forces.get("CD", None)
+                                        CS = forces.get("CS", None)
+                                        CL = forces.get("CL", None)
+                                        Cl = forces.get("Cl", None)
+                                        Cm = forces.get("Cm", None)
+                                        Cn = forces.get("Cn", None)
+
+                                        # Add data to the list
+                                        data.append([alpha, beta, aileron, elevator, rudder, p, q, r, CD, CS, CL, Cl, Cm, Cn])
+        # Convert to Pandas
+        df = pd.DataFrame(data, columns=["alpha", "beta", "aileron", "elevator", "rudder", "p", "q", "r", "CD", "CS", "CL", "Cl", "Cm", "Cn"])
+        # Export to excel file
+        df.to_csv(filename, index=False)
+        print(f"Data exported to {filename}")
 
     def export_stl(self, stl_filename):
         """Exports aircraft geometry as STL
@@ -107,31 +149,29 @@ if __name__ == "__main__":
     machupX_wrapper = MachUpXWrapper(input_file)
 
     # Display the aircraft geometry
-    machupX_wrapper.display_geometry()
+    # machupX_wrapper.display_geometry()
     
     # Define flight parameters
-    alphas = np.linspace(0,0,1)  # Range of angles of attack
-    beta = 0  # Sideslip angle
     velocity = 222.5211  # Velocity (ft/s)
-    p, q, r = 0, 0, 0  # Angular rates (roll, pitch, yaw)
-    elevator, rudder, aileron = 0, 0, 0  # Control deflections
 
     # Which forces to solve for
-    calc_dimensional = True
+    calc_dimensional = False
     calc_non_dimensional = True
     # Loop through different angles of attack
-    for alpha in alphas:
-        print(f"alpha: {alpha} degrees")
-        forces = machupX_wrapper.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, "F16", dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
+    # for alpha in alphas:
+    #     print(f"alpha: {alpha} degrees")
+    #     forces = machupX_wrapper.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, "F16", dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
+
+    machupX_wrapper.export_to_excel("F16_simulation_results.csv", velocity)
 
     # Trim aircraft in pitch
-    trimmed_alpha, trimmed_elevator = machupX_wrapper.pitch_trim("F16")
+    # trimmed_alpha, trimmed_elevator = machupX_wrapper.pitch_trim("F16")
 
     # Get aerodynamic derivatives after aircraft is trimmed
-    machupX_wrapper.derivatives("F16")
+    # machupX_wrapper.derivatives("F16")
 
     # If you want to solve forces again in trimmed state
-    machupX_wrapper.solve_forces(velocity, trimmed_alpha, beta, p, q, r, trimmed_elevator, rudder, aileron, "F16", dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
+    # machupX_wrapper.solve_forces(velocity, trimmed_alpha, beta, p, q, r, trimmed_elevator, rudder, aileron, "F16", dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
 
     #### Export geometry
     # Decide which files to export

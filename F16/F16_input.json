@@ -5,7 +5,7 @@
             "show_legend" : true
         },
         "forces" : {
-            "non_dimensional" : false
+            "non_dimensional" : true
         },
         "pitch_trim" : {
             "set_state_to_trim" : true
