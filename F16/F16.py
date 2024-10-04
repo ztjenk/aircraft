@@ -10,155 +10,160 @@ import pandas as pd
 
 class MachUpXWrapper:
     """Wrapper class for handling MachUpX operations."""
-    
+
     def __init__(self, input_file):
         # Initialize the Scene using the input file
         self.input_file = input_file
         self.my_scene = MX.Scene(scene_input=input_file)
     
-    def display_geometry(self):
-        """Displays the aircraft geometry as a wireframe"""
-        self.my_scene.display_wireframe(show_legend=False)
+    # def display_geometry(self):
+    #     """Displays the aircraft geometry as a wireframe"""
+    #     self.my_scene.display_wireframe(show_legend=False)
 
-    def pitch_trim(self, aircraft_name):
-        """Trims the aircraft in pitch using the elevator"""
+    # def pitch_trim(self, aircraft_name):
+    #     """Trims the aircraft in pitch using the elevator"""
 
-        # Trim the aircraft in pitch and apply the trim state to the scene
-        trim_state = self.my_scene.pitch_trim(set_trim_state=True, verbose=False)
+    #     # Trim the aircraft in pitch and apply the trim state to the scene
+    #     trim_state = self.my_scene.pitch_trim(set_trim_state=True, verbose=False)
 
-        # Print the trimmed state in a JSON format
-        print(f"Trim state for {aircraft_name}:")
-        print(json.dumps(trim_state[aircraft_name], indent=4))
+    #     # Print the trimmed state in a JSON format
+    #     print(f"Trim state for {aircraft_name}:")
+    #     print(json.dumps(trim_state[aircraft_name], indent=4))
 
-        # Saves and returns the trimmed alpha and elevator angles
-        trimmed_alpha = trim_state[aircraft_name]["alpha"]
-        trimmed_elevator = trim_state[aircraft_name]["elevator"]
-        return trimmed_alpha, trimmed_elevator
+    #     # Saves and returns the trimmed alpha and elevator angles
+    #     trimmed_alpha = trim_state[aircraft_name]["alpha"]
+    #     trimmed_elevator = trim_state[aircraft_name]["elevator"]
+    #     return trimmed_alpha, trimmed_elevator
     
-    def derivatives(self, aircraft_name):
-        """Calculates aerodynamic derivatives"""
+    # def derivatives(self, aircraft_name):
+    #     """Calculates aerodynamic derivatives"""
 
-        derivs = self.my_scene.derivatives()
-        print(json.dumps(derivs[aircraft_name], indent=4))
+    #     derivs = self.my_scene.derivatives()
+    #     print(json.dumps(derivs[aircraft_name], indent=4))
 
-        return derivs[aircraft_name]
+    #     return derivs[aircraft_name]
 
-    def solve_forces(self, velocity, alpha, beta, p, q, r, elevator, rudder, aileron, aircraft_name, dimensional=True, non_dimensional=True):
-        """
-        Sets the aircraft state and control, solves for forces, and returns them.
+    # def solve_forces(self, velocity, alpha, beta, p, q, r, elevator, rudder, aileron, aircraft_name, dimensional=True, non_dimensional=True):
+    #     """
+    #     Sets the aircraft state and control, solves for forces, and returns them.
         
-        Parameters:
-        - velocity (float): Aircraft velocity.
-        - alpha (float): Angle of attack (degrees).
-        - beta (float): Sideslip angle (degrees).
-        - p, q, r (float): Angular rates (roll, pitch, yaw in deg/s).
-        - elevator, rudder, aileron (float): Control surface deflections (degrees).
-        - aircraft_name (str): Name of the aircraft in the scene (e.g., 'F16').
+    #     Parameters:
+    #     - velocity (float): Aircraft velocity.
+    #     - alpha (float): Angle of attack (degrees).
+    #     - beta (float): Sideslip angle (degrees).
+    #     - p, q, r (float): Angular rates (roll, pitch, yaw in deg/s).
+    #     - elevator, rudder, aileron (float): Control surface deflections (degrees).
+    #     - aircraft_name (str): Name of the aircraft in the scene (e.g., 'F16').
 
-        Returns:
-        - Force_array (numpy array): Array containing the forces and moments.
-        """
-        # Set aircraft flight state
-        state = {
-            "velocity": velocity,
-            "alpha": alpha,
-            "beta": beta,
-            "angular_rates": [np.radians(p), np.radians(q), np.radians(r)],
-        }
-        # Set control surface deflections
-        control_state = {
-            "elevator": elevator,
-            "rudder": rudder,
-            "aileron": aileron,
-        }
+    #     Returns:
+    #     - Force_array (numpy array): Array containing the forces and moments.
+    #     """
+    #     # Set aircraft flight state
+    #     state = {
+    #         "velocity": velocity,
+    #         "alpha": alpha,
+    #         "beta": beta,
+    #         "angular_rates": [np.radians(p), np.radians(q), np.radians(r)],
+    #     }
+    #     # Set control surface deflections
+    #     control_state = {
+    #         "elevator": elevator,
+    #         "rudder": rudder,
+    #         "aileron": aileron,
+    #     }
         
-        # Apply the aircraft state and control state to the scene
-        self.my_scene.set_aircraft_state(state=state)
-        self.my_scene.set_aircraft_control_state(control_state=control_state)
+    #     # Apply the aircraft state and control state to the scene
+    #     self.my_scene.set_aircraft_state(state=state)
+    #     self.my_scene.set_aircraft_control_state(control_state=control_state)
 
-        # Solve for forces and moments in the body frame
-        forces = self.my_scene.solve_forces(dimensional=dimensional, non_dimensional=non_dimensional, verbose=False)
+    #     # Solve for forces and moments in the body frame
+    #     forces = self.my_scene.solve_forces(dimensional=dimensional, non_dimensional=non_dimensional, verbose=False)
 
-        # Show forces in terminal.
-        print(json.dumps(forces[aircraft_name]["total"], indent=4))
+    #     # Show forces in terminal.
+    #     print(json.dumps(forces[aircraft_name]["total"], indent=4))
 
-        # Parse and return the relevant forces and moments
-        return forces[aircraft_name]["total"]
+    #     # Parse and return the relevant forces and moments
+    #     return forces[aircraft_name]["total"]
 
-    def export_csv(self, filename, dimensional=True, non_dimensional=True, aircraft_name="F16"):
-        "Generates a CSV file with simulation results"
-        # Define ranges for the variables to iterate over
-        velocity = 222.5211                      # ft/s
-        alphas = np.linspace(-25, 25, 11)         # deg
-        betas = np.linspace(-4, 4, 5)            # deg
-        ailerons = np.linspace(0, 10, 1)       # deg
-        elevators = np.linspace(0, 20, 1)      # deg
-        rudders = np.linspace(0, 30, 1)        # deg
-        p_vals = np.linspace(0, 90, 1)         # rad/s
-        q_vals = np.linspace(0, 30, 1)         # rad/s
-        r_vals = np.linspace(0, 30, 1)         # rad/s
+    # def export_csv(self, filename, velocity, dimensional=True, non_dimensional=True, aircraft_name="F16"):
+    #     "Generates a CSV file with simulation results"
+    #     # Define ranges for the variables to iterate over
+    #     # velocity = 222.5211                      # ft/s
+    #     alphas = np.linspace(-25, 25, 1)         # deg
+    #     betas = np.linspace(-4, 4, 1)            # deg
+    #     ailerons = np.linspace(0, 10, 1)       # deg
+    #     elevators = np.linspace(0, 20, 1)      # deg
+    #     rudders = np.linspace(0, 30, 1)        # deg
+    #     p_vals = np.linspace(0, 90, 1)         # rad/s
+    #     q_vals = np.linspace(0, 30, 1)         # rad/s
+    #     r_vals = np.linspace(0, 30, 1)         # rad/s
 
-        # Create a list to store the data
-        data = []
+    #     # Create a list to store the data
+    #     data = []
+    #     print(1)
+    #     # Iterate through all the combinations of values
+    #     for beta in betas:
+    #         print(2)
+    #         for alpha in alphas:
+    #             for aileron in ailerons:
+    #                 for elevator in elevators:
+    #                     for rudder in rudders:
+    #                         for p in p_vals:
+    #                             for q in q_vals:
+    #                                 for r in r_vals:
+    #                                     print(3)
+    #                                     forces = self.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, aircraft_name,
+    #                                                                dimensional=dimensional, non_dimensional=non_dimensional)
+    #                                     Cx = forces.get("Cx", None)
+    #                                     Cy = forces.get("Cy", None)
+    #                                     Cz = forces.get("Cz", None)
+    #                                     Cl = forces.get("Cl", None)
+    #                                     Cm = forces.get("Cm", None)
+    #                                     Cn = forces.get("Cn", None)
 
-        # Iterate through all the combinations of values
-        for beta in betas:
-            for alpha in alphas:
-                for aileron in ailerons:
-                    for elevator in elevators:
-                        for rudder in rudders:
-                            for p in p_vals:
-                                for q in q_vals:
-                                    for r in r_vals:
-                                        forces = self.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, aircraft_name,
-                                                                   dimensional=dimensional, non_dimensional=non_dimensional)
-                                        Cx = forces.get("Cx", None)
-                                        Cy = forces.get("Cy", None)
-                                        Cz = forces.get("Cz", None)
-                                        Cl = forces.get("Cl", None)
-                                        Cm = forces.get("Cm", None)
-                                        Cn = forces.get("Cn", None)
+    #                                     # Add data to the list
+    #                                     data.append([beta, alpha, Cx, Cy, Cz, Cl, Cm, Cn])
+    #     # Convert to Pandas
+    #     df = pd.DataFrame(data, columns=["beta", "alpha", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"])
+    #     # Export to csv file
+    #     df.to_csv(filename, index=False)
+    #     print(f"Data exported to {filename}")
 
-                                        # Add data to the list
-                                        data.append([beta, alpha, Cx, Cy, Cz, Cl, Cm, Cn])
-        # Convert to Pandas
-        df = pd.DataFrame(data, columns=["beta", "alpha", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"])
-        # Export to csv file
-        df.to_csv(filename, index=False)
-        print(f"Data exported to {filename}")
+    # def export_stl(self, stl_filename):
+    #     """Exports aircraft geometry as STL
+    #     - stl_filename: Name of STL file to be saved (None if STL is not needed)
+    #     - dxf_filename: Name of DXF file to be saved (None if DXF is not needeed)
+    #     """
+    #     if export_stl:
+    #         print(f"Exporting aircraft geometry to {stl_filename}...")
+    #         self.my_scene.export_stl(filename=stl_filename)
 
-    def export_stl(self, stl_filename):
-        """Exports aircraft geometry as STL
-        - stl_filename: Name of STL file to be saved (None if STL is not needed)
-        - dxf_filename: Name of DXF file to be saved (None if DXF is not needeed)
-        """
-        if export_stl:
-            print(f"Exporting aircraft geometry to {stl_filename}...")
-            self.my_scene.export_stl(filename=stl_filename)
-
-    def export_dxf_file(self):
-        """Exports aircraft geometry as DXF
-        """
-        if export_dxf:
-            print(f"Exporting aircraft geometry as a DXF")
-            self.my_scene.export_dxf()
+    # def export_dxf_file(self):
+    #     """Exports aircraft geometry as DXF
+    #     """
+    #     if export_dxf:
+    #         print(f"Exporting aircraft geometry as a DXF")
+    #         self.my_scene.export_dxf()
 
 if __name__ == "__main__":
+    print("main")
     # Define the input file for the scene
     input_file = "F16_input.json"
+    print(1)
 
     # Call the MachUpX wrapper
     machupX_wrapper = MachUpXWrapper(input_file)
+    print(2)
 
     # Display the aircraft geometry
     # machupX_wrapper.display_geometry()
     
     # Define flight parameters if not using export_csv
-    # alphas = np.linspace(0,5,2)         # deg
-    # beta = 0                            # deg
-    # velocity = 222.5211                 # ft/s
-    # p,q,r = 0,0,0                       # rad/s
-    # elevator, rudder, aileron = 0,0,0   # deg
+    alphas = np.linspace(0,5,2)         # deg
+    beta = 0                            # deg
+    p,q,r = 0,0,0                       # rad/s
+    elevator, rudder, aileron = 0,0,0   # deg
+    velocity = 222.5211                 # ft/s
 
     # Which forces to solve for
     calc_dimensional = True
@@ -169,7 +174,8 @@ if __name__ == "__main__":
     #     forces = machupX_wrapper.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, "F16", dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
 
     # To export simulation data to a csv file. If using this, must define flight parameters in export_csv function.
-    machupX_wrapper.export_csv("F16_simulation_results.csv", dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
+    print(velocity)
+    # machupX_wrapper.export_csv("F16_simulation_results.csv", velocity, dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
 
     # Trim aircraft in pitch
     # trimmed_alpha, trimmed_elevator = machupX_wrapper.pitch_trim("F16")
