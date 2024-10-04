@@ -7,11 +7,15 @@ import machupX as MX
 import numpy as np
 import json
 import pandas as pd
+import os
 
 class MachUpXWrapper:
     """Wrapper class for handling MachUpX operations."""
 
     def __init__(self, input_file):
+        # Initialize the Scene using the input file
+        self.input_file = input_file
+        self.my_scene = MX.Scene(scene_input=input_file)
         # Initialize the Scene using the input file
         self.input_file = input_file
         self.my_scene = MX.Scene(scene_input=input_file)
@@ -146,14 +150,11 @@ class MachUpXWrapper:
     #         self.my_scene.export_dxf()
 
 if __name__ == "__main__":
-    print("main")
     # Define the input file for the scene
     input_file = "F16_input.json"
-    print(1)
 
     # Call the MachUpX wrapper
     machupX_wrapper = MachUpXWrapper(input_file)
-    print(2)
 
     # Display the aircraft geometry
     # machupX_wrapper.display_geometry()
@@ -174,7 +175,6 @@ if __name__ == "__main__":
     #     forces = machupX_wrapper.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, "F16", dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
 
     # To export simulation data to a csv file. If using this, must define flight parameters in export_csv function.
-    print(velocity)
     # machupX_wrapper.export_csv("F16_simulation_results.csv", velocity, dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
 
     # Trim aircraft in pitch
@@ -195,3 +195,4 @@ if __name__ == "__main__":
 
     machupX_wrapper.export_stl(stl_filename)
     machupX_wrapper.export_dxf_file()
+    print("done")
