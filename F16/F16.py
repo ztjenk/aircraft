@@ -44,7 +44,7 @@ class MachUpXWrapper:
 
         derivs = self.my_scene.derivatives()
         # Print derivatives in the terminal
-        # print(json.dumps(derivs[aircraft_name], indent=4))
+        print(json.dumps(derivs[aircraft_name], indent=4))
 
         return derivs[aircraft_name]
 
@@ -94,7 +94,7 @@ class MachUpXWrapper:
         "Generates a CSV file with simulation results"
         # Define ranges for the variables to iterate over
         # velocity = 222.5211                      # ft/s
-        alphas = np.linspace(-25, 25, 1)         # deg
+        alphas = np.linspace(-25, 25, 11)         # deg
         betas = np.linspace(0, 4, 1)            # deg
         ailerons = np.linspace(0, 10, 1)       # deg
         elevators = np.linspace(0, 20, 1)      # deg
@@ -106,14 +106,14 @@ class MachUpXWrapper:
         # Create a list to store the data
         data = []
         # Iterate through all the combinations of values
-        for beta in betas:
-            for alpha in alphas:
-                for aileron in ailerons:
-                    for elevator in elevators:
-                        for rudder in rudders:
+        for alpha in alphas:
+            # for beta in betas:
+                # for aileron in ailerons:
+                    # for elevator in elevators:
+                        # for rudder in rudders:
                             for p in p_vals:
-                                for q in q_vals:
-                                    for r in r_vals:
+                                # for q in q_vals:
+                                    # for r in r_vals:
                                         # forces = self.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, aircraft_name,
                                         #                            dimensional=dimensional, non_dimensional=non_dimensional)
                                         derivs = self.derivatives(aircraft_name)
@@ -168,7 +168,7 @@ if __name__ == "__main__":
     # machupX_wrapper.display_geometry()
     
     # Define flight parameters if not using export_csv
-    alphas = np.linspace(0,5,2)         # deg
+    alphas = np.linspace(20,5,2)         # deg
     beta = 0                            # deg
     p,q,r = 0,0,0                       # rad/s
     elevator, rudder, aileron = 0,0,0   # deg
@@ -183,13 +183,13 @@ if __name__ == "__main__":
     #     forces = machupX_wrapper.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, "F16", dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
 
     # To export simulation data to a csv file. If using this, must define flight parameters in export_csv function.
-    machupX_wrapper.export_csv("F16_simulation_results.csv", velocity, dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
+    # machupX_wrapper.export_csv("F16_simulation_results.csv", velocity, dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
 
     # Trim aircraft in pitch
     # trimmed_alpha, trimmed_elevator = machupX_wrapper.pitch_trim("F16")
 
     # Get aerodynamic derivatives after aircraft is trimmed
-    # machupX_wrapper.derivatives("F16")
+    machupX_wrapper.derivatives("F16")
 
     # If you want to solve forces again in trimmed state
     # machupX_wrapper.solve_forces(velocity, trimmed_alpha, beta, p, q, r, trimmed_elevator, rudder, aileron, "F16", dimensional=calc_dimensional, non_dimensional=calc_non_dimensional)
