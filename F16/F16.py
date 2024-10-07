@@ -43,7 +43,8 @@ class MachUpXWrapper:
         """Calculates aerodynamic derivatives"""
 
         derivs = self.my_scene.derivatives()
-        print(json.dumps(derivs[aircraft_name], indent=4))
+        # Print derivatives in the terminal
+        # print(json.dumps(derivs[aircraft_name], indent=4))
 
         return derivs[aircraft_name]
 
@@ -84,7 +85,7 @@ class MachUpXWrapper:
         forces = self.my_scene.solve_forces(dimensional=dimensional, non_dimensional=non_dimensional, verbose=False)
 
         # Show forces in terminal.
-        print(json.dumps(forces[aircraft_name]["total"], indent=4))
+        # print(json.dumps(forces[aircraft_name]["total"], indent=4))
 
         # Parse and return the relevant forces and moments
         return forces[aircraft_name]["total"]
@@ -93,12 +94,12 @@ class MachUpXWrapper:
         "Generates a CSV file with simulation results"
         # Define ranges for the variables to iterate over
         # velocity = 222.5211                      # ft/s
-        alphas = np.linspace(-25, 25, 11)         # deg
-        betas = np.linspace(-4, 4, 5)            # deg
+        alphas = np.linspace(-25, 25, 1)         # deg
+        betas = np.linspace(0, 4, 1)            # deg
         ailerons = np.linspace(0, 10, 1)       # deg
         elevators = np.linspace(0, 20, 1)      # deg
         rudders = np.linspace(0, 30, 1)        # deg
-        p_vals = np.linspace(0, 90, 1)         # rad/s
+        p_vals = np.concatenate([np.linspace(-.1058863402253694, -1e-12, 2), np.linspace(0, .1058863402253694, 2)    ])     # rad/s
         q_vals = np.linspace(0, 30, 1)         # rad/s
         r_vals = np.linspace(0, 30, 1)         # rad/s
 
@@ -113,19 +114,29 @@ class MachUpXWrapper:
                             for p in p_vals:
                                 for q in q_vals:
                                     for r in r_vals:
-                                        forces = self.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, aircraft_name,
-                                                                   dimensional=dimensional, non_dimensional=non_dimensional)
-                                        Cx = forces.get("Cx", None)
-                                        Cy = forces.get("Cy", None)
-                                        Cz = forces.get("Cz", None)
-                                        Cl = forces.get("Cl", None)
-                                        Cm = forces.get("Cm", None)
-                                        Cn = forces.get("Cn", None)
+                                        # forces = self.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, aircraft_name,
+                                        #                            dimensional=dimensional, non_dimensional=non_dimensional)
+                                        derivs = self.derivatives(aircraft_name)
+                                        damping = derivs.get("damping", {})
+                                        Cx_pbar = damping.get("Cx,pbar", None)
+                                        Cy_pbar = damping.get("Cy,pbar", None)
+                                        Cz_pbar = damping.get("Cz,pbar", None)
+                                        Cl_pbar = damping.get("Cl,pbar", None)
+                                        Cm_pbar = damping.get("Cm,pbar", None)
+                                        Cn_pbar = damping.get("Cn,pbar", None)
+                                        # Cx = forces.get("Cx", None)
+                                        # Cy = forces.get("Cy", None)
+                                        # Cz = forces.get("Cz", None)
+                                        # Cl = forces.get("Cl", None)
+                                        # Cm = forces.get("Cm", None)
+                                        # Cn = forces.get("Cn", None)
 
                                         # Add data to the list
-                                        data.append([beta, alpha, Cx, Cy, Cz, Cl, Cm, Cn])
+                                        # data.append([beta, alpha, Cx_pbar, Cy_pbar, Cl_pbar, Cm_pbar, Cn_pbar, Cx, Cy, Cz, Cl, Cm, Cn]) # use this for (alpha,beta)
+                                        data.append([p, alpha, Cx_pbar, Cy_pbar, Cz_pbar, Cl_pbar, Cm_pbar, Cn_pbar]) # use this for p(alpha,p)
         # Convert to Pandas
-        df = pd.DataFrame(data, columns=["beta", "alpha", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"])
+        # df = pd.DataFrame(data, columns=["beta", "alpha", "Cx_pbar", "Cy_pbar", "Cl_pbar", "Cm_pbar", "Cn_pbar", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"]) # use this for (alpha,beta)
+        df = pd.DataFrame(data, columns=["pbar(rad)", "alpha(deg)", "Cx_pbar", "Cy_pbar", "Cz_pbar", "Cl_pbar", "Cm_pbar", "Cn_pbar"]) # use this for p(alpha,p)
         # Export to csv file
         df.to_csv(filename, index=False)
         print(f"Data exported to {filename}")
