@@ -113,7 +113,6 @@ class MachUpXWrapper:
                             for p in p_vals:
                                 for q in q_vals:
                                     for r in r_vals:
-                                        print(3)
                                         forces = self.solve_forces(velocity, alpha, beta, p, q, r, elevator, rudder, aileron, aircraft_name,
                                                                    dimensional=dimensional, non_dimensional=non_dimensional)
                                         Cx = forces.get("Cx", None)
