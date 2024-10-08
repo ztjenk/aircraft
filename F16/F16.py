@@ -96,14 +96,14 @@ class MachUpXWrapper:
         # velocity = 222.5211                      # ft/s
         alphas = np.linspace(-25, 25, 11)         # deg
         betas = np.linspace(-4, 4, 5)            # deg
-        # ailerons = np.linspace(0, 10, 1)       # deg
-        elevators = np.linspace(-20, 20, 3)      # deg
+        ailerons = np.linspace(-21.5, 21.5, 1)       # deg
+        # elevators = np.linspace(-20, 20, 3)      # deg
         # rudders = np.linspace(0, 30, 1)        # deg
         # p_vals = np.concatenate([np.linspace(-.1058863402253694, -1e-12, 2), np.linspace(0, .1058863402253694, 2)    ])     # rad/s
         # q_vals = np.concatenate([np.linspace(-.013318148570568686, -1e-12, 2), np.linspace(0, .013318148570568686, 2)    ])     # rad/s
         # r_vals = np.concatenate([np.linspace(-.0352954467417898, -1e-12, 2), np.linspace(0, .0352954467417898, 2)    ])     # rad/s
-        beta = 0
-        aileron = 0
+        # beta = 0
+        # aileron = 0
         elevator = 0
         rudder = 0
         p = 0
@@ -113,9 +113,9 @@ class MachUpXWrapper:
         # Create a list to store the data
         data = []
         # Iterate through all the combinations of values
-        for elevator in elevators:
+        for aileron in ailerons:
             for beta in betas:
-            #     for aileron in ailerons:
+            #     for elevator in elevators:
             #         for r in r_vals:
             #             for rudder in rudders:
                             for alpha in alphas:
@@ -129,8 +129,8 @@ class MachUpXWrapper:
                                         }
                                         self.my_scene.set_aircraft_state(state=state)
                                         control_state = {
-                                             "elevator": elevator,
-                                             "rudder": rudder,
+                                            "elevator": elevator,
+                                            "rudder": rudder,
                                             "aileron": aileron,
                                         }
                                         self.my_scene.set_aircraft_control_state(control_state=control_state)
@@ -171,13 +171,15 @@ class MachUpXWrapper:
                                         # data.append([p, alpha, Cx_pbar, Cy_pbar, Cz_pbar, Cl_pbar, Cm_pbar, Cn_pbar]) # use this for p(alpha,p)
                                         # data.append([q, alpha, Cx_qbar, Cy_qbar, Cz_qbar, Cl_qbar, Cm_qbar, Cn_qbar]) # use this for q(alpha,q)
                                         # data.append([r, alpha, Cx_rbar, Cy_rbar, Cz_rbar, Cl_rbar, Cm_rbar, Cn_rbar]) # use this for r(alpha,r)
-                                        data.append([elevator, beta, alpha, Cx, Cy, Cz, Cl, Cm, Cn]) # use this for DC(alpha,beta,elevator)
+                                        # data.append([elevator, beta, alpha, Cx, Cy, Cz, Cl, Cm, Cn]) # use this for DC(alpha,beta,elevator)
+                                        data.append([aileron, beta, alpha, Cx, Cy, Cz, Cl, Cm, Cn]) # use this for DC(alpha,beta,aileron)
         # Convert to Pandas
         # df = pd.DataFrame(data, columns=["beta", "alpha", "Cx_pbar", "Cy_pbar", "Cl_pbar", "Cm_pbar", "Cn_pbar", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"]) # use this for (alpha,beta)
         # df = pd.DataFrame(data, columns=["pbar(rad/s)", "alpha(deg)", "Cx_pbar", "Cy_pbar", "Cz_pbar", "Cl_pbar", "Cm_pbar", "Cn_pbar"]) # use this for p(alpha,p)
         # df = pd.DataFrame(data, columns=["qbar(rad/s)", "alpha(deg)", "Cx_pbar", "Cy_qbar", "Cz_qbar", "Cl_qbar", "Cm_qbar", "Cn_qbar"]) # use this for q(alpha,q)
         # df = pd.DataFrame(data, columns=["rbar(rad/s)", "alpha(deg)", "Cx_rbar", "Cy_rbar", "Cz_rbar", "Cl_rbar", "Cm_rbar", "Cn_rbar"]) # use this for r(alpha,r)
-        df = pd.DataFrame(data, columns=["elevator(deg)", "beta(deg)", "alpha(deg)", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"]) # use this for DC(alpha,beta,elevator)
+        # df = pd.DataFrame(data, columns=["elevator(deg)", "beta(deg)", "alpha(deg)", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"]) # use this for DC(alpha,beta,elevator)
+        df = pd.DataFrame(data, columns=["aileron(deg)", "beta(deg)", "alpha(deg)", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"]) # use this for DC(alpha,beta,aileron)
         # Export to csv file
         df.to_csv(filename, index=False)
         print(f"Data exported to {filename}")
