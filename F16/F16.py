@@ -96,7 +96,7 @@ class MachUpXWrapper:
         # velocity = 222.5211                      # ft/s
         alphas = np.linspace(-25, 25, 11)         # deg
         betas = np.linspace(-4, 4, 5)            # deg
-        # ailerons = np.linspace(-21.5, 21.5, 3)       # deg
+        ailerons = np.linspace(-21.5, 21.5, 3)       # deg
         # elevators = np.linspace(-20, 20, 3)      # deg
         # rudders = np.linspace(-30, 30, 3)        # deg
         # p_vals = np.concatenate([np.linspace(-.1058863402253694, -1e-12, 2), np.linspace(0, .1058863402253694, 2)    ])     # rad/s
