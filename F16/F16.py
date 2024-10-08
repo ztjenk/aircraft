@@ -96,16 +96,16 @@ class MachUpXWrapper:
         # velocity = 222.5211                      # ft/s
         alphas = np.linspace(-25, 25, 11)         # deg
         betas = np.linspace(-4, 4, 5)            # deg
-        ailerons = np.linspace(-21.5, 21.5, 3)       # deg
+        # ailerons = np.linspace(-21.5, 21.5, 3)       # deg
         # elevators = np.linspace(-20, 20, 3)      # deg
-        # rudders = np.linspace(-30, 30, 3)        # deg
+        rudders = np.linspace(-30, 30, 3)        # deg
         # p_vals = np.concatenate([np.linspace(-.1058863402253694, -1e-12, 2), np.linspace(0, .1058863402253694, 2)    ])     # rad/s
         # q_vals = np.concatenate([np.linspace(-.013318148570568686, -1e-12, 2), np.linspace(0, .013318148570568686, 2)    ])     # rad/s
         # r_vals = np.concatenate([np.linspace(-.0352954467417898, -1e-12, 2), np.linspace(0, .0352954467417898, 2)    ])     # rad/s
         # beta = 0
-        # aileron = 0
+        aileron = 0
         elevator = 0
-        rudder = 0
+        # rudder = 0
         p = 0
         q = 0
         r = 0
@@ -113,11 +113,11 @@ class MachUpXWrapper:
         # Create a list to store the data
         data = []
         # Iterate through all the combinations of values
-        for aileron in ailerons:
+        for rudder in rudders:
             for beta in betas:
             #     for elevator in elevators:
             #         for r in r_vals:
-            #             for rudder in rudders:
+            #             for aileron in ailerons:
                             for alpha in alphas:
                                 # for p in p_vals:
                                 #     for q in q_vals:
@@ -138,6 +138,7 @@ class MachUpXWrapper:
                                                                    dimensional=dimensional, non_dimensional=non_dimensional)
                                         # derivs = self.derivatives(aircraft_name)
                                         # damping = derivs.get("damping", {})
+                                        
                                         # Cx_pbar = damping.get("Cx,pbar", None)
                                         # Cy_pbar = damping.get("Cy,pbar", None)
                                         # Cz_pbar = damping.get("Cz,pbar", None)
@@ -172,14 +173,16 @@ class MachUpXWrapper:
                                         # data.append([q, alpha, Cx_qbar, Cy_qbar, Cz_qbar, Cl_qbar, Cm_qbar, Cn_qbar]) # use this for q(alpha,q)
                                         # data.append([r, alpha, Cx_rbar, Cy_rbar, Cz_rbar, Cl_rbar, Cm_rbar, Cn_rbar]) # use this for r(alpha,r)
                                         # data.append([elevator, beta, alpha, Cx, Cy, Cz, Cl, Cm, Cn]) # use this for DC(alpha,beta,elevator)
-                                        data.append([aileron, beta, alpha, Cx, Cy, Cz, Cl, Cm, Cn]) # use this for DC(alpha,beta,aileron)
+                                        # data.append([aileron, beta, alpha, Cx, Cy, Cz, Cl, Cm, Cn]) # use this for DC(alpha,beta,aileron)
+                                        data.append([rudder, beta, alpha, Cx, Cy, Cz, Cl, Cm, Cn]) # use this for DC(alpha,beta,rudder)
         # Convert to Pandas
         # df = pd.DataFrame(data, columns=["beta", "alpha", "Cx_pbar", "Cy_pbar", "Cl_pbar", "Cm_pbar", "Cn_pbar", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"]) # use this for (alpha,beta)
         # df = pd.DataFrame(data, columns=["pbar(rad/s)", "alpha(deg)", "Cx_pbar", "Cy_pbar", "Cz_pbar", "Cl_pbar", "Cm_pbar", "Cn_pbar"]) # use this for p(alpha,p)
         # df = pd.DataFrame(data, columns=["qbar(rad/s)", "alpha(deg)", "Cx_pbar", "Cy_qbar", "Cz_qbar", "Cl_qbar", "Cm_qbar", "Cn_qbar"]) # use this for q(alpha,q)
         # df = pd.DataFrame(data, columns=["rbar(rad/s)", "alpha(deg)", "Cx_rbar", "Cy_rbar", "Cz_rbar", "Cl_rbar", "Cm_rbar", "Cn_rbar"]) # use this for r(alpha,r)
         # df = pd.DataFrame(data, columns=["elevator(deg)", "beta(deg)", "alpha(deg)", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"]) # use this for DC(alpha,beta,elevator)
-        df = pd.DataFrame(data, columns=["aileron(deg)", "beta(deg)", "alpha(deg)", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"]) # use this for DC(alpha,beta,aileron)
+        # df = pd.DataFrame(data, columns=["aileron(deg)", "beta(deg)", "alpha(deg)", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"]) # use this for DC(alpha,beta,aileron)
+        df = pd.DataFrame(data, columns=["rudder(deg)", "beta(deg)", "alpha(deg)", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"]) # use this for DC(alpha,beta,rudder)
         # Export to csv file
         df.to_csv(filename, index=False)
         print(f"Data exported to {filename}")
