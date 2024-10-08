@@ -14,8 +14,8 @@
         "aero_center" : {}
     },
     "solver" : {
-        "type" : "nonlinear",
-        "convergence" : 6e-8,
+        "type" : "linear",
+        "convergence" : 1e-8,
         "relaxation" : 1,
         "max_iterations" : 1000
     },
