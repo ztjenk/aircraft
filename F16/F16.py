@@ -94,7 +94,7 @@ class MachUpXWrapper:
         "Generates a CSV file with simulation results"
         # Define ranges for the variables to iterate over
         # velocity = 222.5211                      # ft/s
-        alphas = np.linspace(-25, 25, 1)         # deg
+        alphas = np.linspace(-25, 25, 11)         # deg
         betas = np.linspace(0, 4, 1)            # deg
         ailerons = np.linspace(0, 10, 1)       # deg
         elevators = np.linspace(0, 20, 1)      # deg
