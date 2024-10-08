@@ -95,25 +95,32 @@ class MachUpXWrapper:
         # Define ranges for the variables to iterate over
         # velocity = 222.5211                      # ft/s
         alphas = np.linspace(-25, 25, 11)         # deg
-        betas = np.linspace(0, 4, 1)            # deg
-        ailerons = np.linspace(0, 10, 1)       # deg
-        elevators = np.linspace(0, 20, 1)      # deg
-        rudders = np.linspace(0, 30, 1)        # deg
-        p_vals = np.concatenate([np.linspace(-.1058863402253694, -1e-12, 2), np.linspace(0, .1058863402253694, 2)    ])     # rad/s
-        q_vals = np.linspace(0, 30, 1)         # rad/s
-        r_vals = np.linspace(0, 30, 1)         # rad/s
+        # betas = np.linspace(0, 4, 1)            # deg
+        # ailerons = np.linspace(0, 10, 1)       # deg
+        # elevators = np.linspace(0, 20, 1)      # deg
+        # rudders = np.linspace(0, 30, 1)        # deg
+        # p_vals = np.concatenate([np.linspace(-.1058863402253694, -1e-12, 2), np.linspace(0, .1058863402253694, 2)    ])     # rad/s
+        q_vals = np.concatenate([np.linspace(-.013318148570568686, -1e-12, 2), np.linspace(0, .013318148570568686, 2)    ])     # rad/s
+        # r_vals = np.linspace(0, 30, 1)         # rad/s
+        beta = 0
+        aileron = 0
+        elevator = 0
+        rudder = 0
+        p = 0
+        # q = 0
+        r = 0
 
         # Create a list to store the data
         data = []
         # Iterate through all the combinations of values
-        for p in p_vals:
-            for beta in betas:
-                for aileron in ailerons:
-                    for elevator in elevators:
-                        for rudder in rudders:
+        for q in q_vals:
+            # for beta in betas:
+            #     for aileron in ailerons:
+            #         for elevator in elevators:
+            #             for rudder in rudders:
                             for alpha in alphas:
-                                for q in q_vals:
-                                    for r in r_vals:
+                                # for p in p_vals:
+                                #     for r in r_vals:
                                         state = {
                                               "velocity": velocity,
                                               "alpha": alpha,
@@ -131,12 +138,18 @@ class MachUpXWrapper:
                                         #                            dimensional=dimensional, non_dimensional=non_dimensional)
                                         derivs = self.derivatives(aircraft_name)
                                         damping = derivs.get("damping", {})
-                                        Cx_pbar = damping.get("Cx,pbar", None)
-                                        Cy_pbar = damping.get("Cy,pbar", None)
-                                        Cz_pbar = damping.get("Cz,pbar", None)
-                                        Cl_pbar = damping.get("Cl,pbar", None)
-                                        Cm_pbar = damping.get("Cm,pbar", None)
-                                        Cn_pbar = damping.get("Cn,pbar", None)
+                                        # Cx_pbar = damping.get("Cx,pbar", None)
+                                        # Cy_pbar = damping.get("Cy,pbar", None)
+                                        # Cz_pbar = damping.get("Cz,pbar", None)
+                                        # Cl_pbar = damping.get("Cl,pbar", None)
+                                        # Cm_pbar = damping.get("Cm,pbar", None)
+                                        # Cn_pbar = damping.get("Cn,pbar", None)
+                                        Cx_qbar = damping.get("Cx,qbar", None)
+                                        Cy_qbar = damping.get("Cy,qbar", None)
+                                        Cz_qbar = damping.get("Cz,qbar", None)
+                                        Cl_qbar = damping.get("Cl,qbar", None)
+                                        Cm_qbar = damping.get("Cm,qbar", None)
+                                        Cn_qbar = damping.get("Cn,qbar", None)
                                         # Cx = forces.get("Cx", None)
                                         # Cy = forces.get("Cy", None)
                                         # Cz = forces.get("Cz", None)
@@ -146,10 +159,12 @@ class MachUpXWrapper:
 
                                         # Add data to the list
                                         # data.append([beta, alpha, Cx_pbar, Cy_pbar, Cl_pbar, Cm_pbar, Cn_pbar, Cx, Cy, Cz, Cl, Cm, Cn]) # use this for (alpha,beta)
-                                        data.append([p, alpha, Cx_pbar, Cy_pbar, Cz_pbar, Cl_pbar, Cm_pbar, Cn_pbar]) # use this for p(alpha,p)
+                                        # data.append([q, alpha, Cx_pbar, Cy_pbar, Cz_pbar, Cl_pbar, Cm_pbar, Cn_pbar]) # use this for p(alpha,p)
+                                        data.append([q, alpha, Cx_qbar, Cy_qbar, Cz_qbar, Cl_qbar, Cm_qbar, Cn_qbar]) # use this for q(alpha,q)
         # Convert to Pandas
         # df = pd.DataFrame(data, columns=["beta", "alpha", "Cx_pbar", "Cy_pbar", "Cl_pbar", "Cm_pbar", "Cn_pbar", "Cx", "Cy", "Cz", "Cl", "Cm", "Cn"]) # use this for (alpha,beta)
-        df = pd.DataFrame(data, columns=["pbar(rad)", "alpha(deg)", "Cx_pbar", "Cy_pbar", "Cz_pbar", "Cl_pbar", "Cm_pbar", "Cn_pbar"]) # use this for p(alpha,p)
+        # df = pd.DataFrame(data, columns=["pbar(rad/s)", "alpha(deg)", "Cx_pbar", "Cy_pbar", "Cz_pbar", "Cl_pbar", "Cm_pbar", "Cn_pbar"]) # use this for p(alpha,p)
+        df = pd.DataFrame(data, columns=["qbar(rad/s)", "alpha(deg)", "Cx_pbar", "Cy_qbar", "Cz_qbar", "Cl_qbar", "Cm_qbar", "Cn_qbar"]) # use this for q(alpha,q)
         # Export to csv file
         df.to_csv(filename, index=False)
         print(f"Data exported to {filename}")
